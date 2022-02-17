@@ -23,7 +23,7 @@ public class WordLadders {
         gameExhaustive.play("jura", "such");
         gamePriority.play("jura", "such");
         System.out.println();
-//
+
 //        gameExhaustive.play("stet", "whey");
 //        gamePriority.play("stet", "whey");
 //        System.out.println();

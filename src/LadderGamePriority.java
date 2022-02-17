@@ -10,57 +10,36 @@ public class LadderGamePriority extends LadderGame {
         readDictionary(dictionaryFile);
     }
     public void play(String start, String end) {
-        deepCloneDict();
-        int enqueueCounter = 0;
-//        if (start.length() == end.length() && dictionary.get(start.length() - 1).contains(start) && dictionary.get(end.length() - 1).contains(end)) return;
 
-        int priority = findPriority(start, end);
-        boolean solutionFound = false;
+        int enqueueCounter = 0;
+        int priority = findPriority(start, end, 0);
         AVLTree<WordInfoPriority> priorityQueue = new AVLTree<>();
-        priorityQueue.insert(new WordInfoPriority(start, 0, priority));
+        priorityQueue.insert(new WordInfoPriority(start, 1, priority));
         enqueueCounter++;
 
-        while (!solutionFound || !priorityQueue.isEmpty()) {
+        while (!priorityQueue.isEmpty()) {
             var highestPriority = priorityQueue.deleteMin();
+            var moves = highestPriority.getMoves() + 1;
+            var history = "";
+            if (highestPriority.getHistory() == null) {
+                history = highestPriority.getWord();
+            } else {
+                history = highestPriority.getHistory() + " " + highestPriority.getWord();
+            }
             ArrayList<String> oneAways = this.oneAway(highestPriority.getWord(), false);
             for (String word : oneAways) {
+                WordInfoPriority ladder = new WordInfoPriority(word, moves, findPriority(word, end, moves), history);
                 if (word.equals(end)) {
-                    solutionFound = true;
-                    System.out.println("Seeking A* solution from " + start + " -> " + end + "\n [" + highestPriority.getHistory() + " " +  end + "] " + enqueueCounter + " total enqueues");
+                    System.out.println("Seeking A* solution from " + start + " -> " + end + "\n [" + history + " " +  end + "] " + enqueueCounter + " total enqueues");
                     return;
                 }
                 enqueueCounter++;
-                priorityQueue.insert(new WordInfoPriority(word, 0, findPriority(word, end), highestPriority.getHistory() + " " + word));
+                priorityQueue.insert(ladder);
             }
         }
     }
 
-//        queue.enqueue(ladder);
-//            boolean solutionFound = false;
-//            Queue<WordInfoPriority> partialSolution = new Queue<>();
-//            partialSolution.enqueue(ladder, 1, 2);
-//            enqueueCounter++;
-//
-//            while (!partialSolution.isEmpty() && !solutionFound) {
-//                WordInfoPriority curLadder = partialSolution.dequeue();
-//                ArrayList<String> oneAways = this.oneAway(curLadder.getWord(), false);
-//                for(String word : oneAways) {
-//                    ladder = new WordInfoPriority(word, curLadder.getMoves() + 1, curLadder.getHistory() + " " + word);
-//                    if (word.equals(end)) {
-//                        solutionFound = true;
-//                        System.out.println("Seeking A* solution from " + start + " -> " + end + "\n [" + ladder.getHistory() + "] " + enqueueCounter + " total enqueues");
-//                        break;
-//                    } else {
-//                        partialSolution.enqueue(ladder);
-//                        enqueueCounter++;
-//                    }
-//                }
-//            }
-//            if (partialSolution.isEmpty()) {
-//                System.out.println(start + " -> " + end + " : No ladder was found");
-//            }
-
-    public int findPriority(String word, String goal) {
+    public int findPriority(String word, String goal, int moves) {
         int wordSize = word.length();
         int counter = 0;
         for (int m = 0; m < wordSize; m++) {
@@ -68,7 +47,7 @@ public class LadderGamePriority extends LadderGame {
                 counter++;
             }
         }
-        return counter;
+        return counter + moves;
     }
 
     public ArrayList<String> oneAway(String word, boolean withRemoval) {

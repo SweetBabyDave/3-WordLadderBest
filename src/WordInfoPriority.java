@@ -45,7 +45,7 @@ public class WordInfoPriority implements Comparable<WordInfoPriority> {
     }
     @Override
     public int compareTo(WordInfoPriority o) {
-        return Double.compare(this.priority, o.priority);
+        return Integer.compare(this.priority, o.priority);
     }
 }
 

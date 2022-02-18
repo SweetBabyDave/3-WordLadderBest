@@ -16,7 +16,7 @@ public class LadderGamePriority extends LadderGame {
 
         while (!priorityQueue.isEmpty()) {
             var highestPriority = priorityQueue.deleteMin();
-            previousWords.add(highestPriority);
+//            previousWords.add(highestPriority);
             var moves = highestPriority.getMoves() + 1;
             var history = "";
             if (highestPriority.getHistory() == null) {
@@ -30,12 +30,18 @@ public class LadderGamePriority extends LadderGame {
             }
             ArrayList<String> oneAways = this.oneAway(highestPriority.getWord(), false);
             for (String word : oneAways) {
+                boolean add = true;
                 WordInfoPriority ladder = new WordInfoPriority(word, moves, findPriority(word, end, moves), history);
-                if (previousWords.contains(word) && ladder.getMoves() < moves) {
-
+                for (WordInfoPriority rung : previousWords) {
+                    if (rung.getWord().equals(word) && rung.getPriority() <= ladder.getPriority()) {
+                        add = false;
+                    }
                 }
-                enqueueCounter++;
-                priorityQueue.insert(ladder);
+                if (add) {
+                    previousWords.add(ladder);
+                    enqueueCounter++;
+                    priorityQueue.insert(ladder);
+                }
             }
         }
     }

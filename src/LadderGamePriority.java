@@ -9,12 +9,14 @@ public class LadderGamePriority extends LadderGame {
     public void play(String start, String end) {
         int enqueueCounter = 0;
         int priority = findPriority(start, end, 0);
+        ArrayList<WordInfoPriority> previousWords = new ArrayList<>();
         AVLTree<WordInfoPriority> priorityQueue = new AVLTree<>();
         priorityQueue.insert(new WordInfoPriority(start, 0, priority));
         enqueueCounter++;
 
         while (!priorityQueue.isEmpty()) {
             var highestPriority = priorityQueue.deleteMin();
+            previousWords.add(highestPriority);
             var moves = highestPriority.getMoves() + 1;
             var history = "";
             if (highestPriority.getHistory() == null) {
@@ -29,6 +31,9 @@ public class LadderGamePriority extends LadderGame {
             ArrayList<String> oneAways = this.oneAway(highestPriority.getWord(), false);
             for (String word : oneAways) {
                 WordInfoPriority ladder = new WordInfoPriority(word, moves, findPriority(word, end, moves), history);
+                if (previousWords.contains(word) && ladder.getMoves() < moves) {
+
+                }
                 enqueueCounter++;
                 priorityQueue.insert(ladder);
             }
